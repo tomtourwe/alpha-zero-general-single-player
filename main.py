@@ -3,8 +3,11 @@ import logging
 import coloredlogs
 
 from Coach import Coach
-from othello.OthelloGame import OthelloGame as Game
-from othello.pytorch.NNet import NNetWrapper as nn
+
+from qzero_planning.NNet import NNetWrapper as pnn
+from qzero_planning.PlanningGame import PlanningGame
+from qzero_planning.PlanningLogic import DomainAction, MinSpanTimeRewardStrategy
+
 from utils import *
 
 log = logging.getLogger(__name__)
@@ -30,11 +33,17 @@ args = dotdict({
 
 
 def main():
-    log.info('Loading %s...', Game.__name__)
-    g = Game(6)
+    domainactions = [DomainAction(urn=1, duration=2), DomainAction(urn=2, duration=2),
+                     DomainAction(urn=3, duration=1), DomainAction(urn=4, duration=1),
+                     DomainAction(urn=5, duration=2), DomainAction(urn=6, duration=1)]
+    machines = 6
+    timesteps = 6
 
-    log.info('Loading %s...', nn.__name__)
-    nnet = nn(g)
+    log.info(f'Loading {PlanningGame.__name__}...')
+    g = PlanningGame(machines=machines, timesteps=timesteps, domainactions=domainactions,rewardstrategy=MinSpanTimeRewardStrategy(-((machines*timesteps) + 1)))
+
+    log.info('Loading %s...', pnn.__name__)
+    nnet = pnn(g)
 
     if args.load_model:
         log.info('Loading checkpoint "%s/%s"...', args.load_folder_file[0], args.load_folder_file[1])

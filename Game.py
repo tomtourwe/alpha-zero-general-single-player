@@ -33,7 +33,20 @@ class Game():
         """
         pass
 
-    def getNextState(self, board, player, action):
+    # def getNextState(self, board, player, action):
+    #     """
+    #     Input:
+    #         board: current board
+    #         player: current player (1 or -1)
+    #         action: action taken by current player
+
+    #     Returns:
+    #         nextBoard: board after applying action
+    #         nextPlayer: player who plays in the next turn (should be -player)
+    #     """
+    #     pass
+
+    def getNextState(self, board, action):
         """
         Input:
             board: current board
@@ -46,24 +59,48 @@ class Game():
         """
         pass
 
-    def getValidMoves(self, board, player):
+    # def getValidMoves(self, board, player):
+    #     """
+    #     Input:
+    #         board: current board
+    #         player: current player
+
+    #     Returns:
+    #         validMoves: a binary vector of length self.getActionSize(), 1 for
+    #                     moves that are valid from the current board and player,
+    #                     0 for invalid moves
+    #     """
+    #     pass
+
+    def getValidMoves(self, board):
         """
         Input:
             board: current board
-            player: current player
 
         Returns:
             validMoves: a binary vector of length self.getActionSize(), 1 for
-                        moves that are valid from the current board and player,
+                        moves that are valid from the current board,
                         0 for invalid moves
         """
         pass
 
-    def getGameEnded(self, board, player):
+    # def getGameEnded(self, board, player):
+    #     """
+    #     Input:
+    #         board: current board
+    #         player: current player (1 or -1)
+
+    #     Returns:
+    #         r: 0 if game has not ended. 1 if player won, -1 if player lost,
+    #            small non-zero value for draw.
+               
+    #     """
+    #     pass
+
+    def getGameEnded(self, board):
         """
         Input:
             board: current board
-            player: current player (1 or -1)
 
         Returns:
             r: 0 if game has not ended. 1 if player won, -1 if player lost,
@@ -72,12 +109,26 @@ class Game():
         """
         pass
 
-    def getCanonicalForm(self, board, player):
+    # def getCanonicalForm(self, board, player):
+    #     """
+    #     Input:
+    #         board: current board
+    #         player: current player (1 or -1)
+
+    #     Returns:
+    #         canonicalBoard: returns canonical form of board. The canonical form
+    #                         should be independent of player. For e.g. in chess,
+    #                         the canonical form can be chosen to be from the pov
+    #                         of white. When the player is white, we can return
+    #                         board as is. When the player is black, we can invert
+    #                         the colors and return the board.
+    #     """
+    #     pass
+
+    def getCanonicalForm(self, board):
         """
         Input:
             board: current board
-            player: current player (1 or -1)
-
         Returns:
             canonicalBoard: returns canonical form of board. The canonical form
                             should be independent of player. For e.g. in chess,
