@@ -1,6 +1,7 @@
 from Game import Game
 from .PlanningLogic import PlanningRepresentation
 import numpy as np
+from sympy.utilities.iterables import multiset_permutations
 
 class PlanningGame(Game):
     def __init__(self, machines, timesteps, domainactions, rewardstrategy):
@@ -117,6 +118,18 @@ class PlanningGame(Game):
                             the colors and return the board.
         """
         return board
+
+    # def _unique_permutations(x):
+    #     # ys = list of (row_idx, boolean) indicating whether 
+    #     # or not the row at index idx has non-zero elements
+    #     ys = list(zip(range(len(x)), np.any(x != 0, axis=1))) 
+    #     # sort the list so that the last elemant can be (row_idx, False)
+    #     # IF there is a row with only zeros
+    #     ys = sorted(ys, key=lambda x: x[1], reverse=True)
+    #     # keep the idx if (idx, True) else keep the idx of the last element
+    #     idxs = [x[0] if x[1] else ys[-1][0] for x in ys]
+    #     # compute the permutations without duplicates and map back to the input
+    #     return [x[p] for p in multiset_permutations(idxs)]
 
     def getSymmetries(self, board, pi):
         """
