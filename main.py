@@ -6,7 +6,7 @@ from Coach import Coach
 
 from qzero_planning.NNet import NNetWrapper as pnn
 from qzero_planning.PlanningGame import PlanningGame
-from qzero_planning.PlanningLogic import DomainAction, MinSpanTimeRewardStrategy
+from qzero_planning.PlanningLogic import DomainAction, MinSpanTimeRewardStrategy, RelativeProductRewardStrategy
 
 from utils import *
 
@@ -40,8 +40,9 @@ def main():
     timesteps = 6
 
     log.info(f'Loading {PlanningGame.__name__}...')
-    g = PlanningGame(machines=machines, timesteps=timesteps, domainactions=domainactions,rewardstrategy=MinSpanTimeRewardStrategy(-((machines*timesteps) + 1)))
-
+    # g = PlanningGame(machines=machines, timesteps=timesteps, domainactions=domainactions,rewardstrategy=MinSpanTimeRewardStrategy(-((machines*timesteps) + 1)))
+    g = PlanningGame(machines=machines, timesteps=timesteps, domainactions=domainactions,rewardstrategy=RelativeProductRewardStrategy(-((machines**timesteps)+1)))
+    
     log.info('Loading %s...', pnn.__name__)
     nnet = pnn(g)
 

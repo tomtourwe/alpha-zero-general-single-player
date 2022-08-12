@@ -82,6 +82,15 @@ class RewardStrategy:
     def compute_reward(self, schedule):
         pass
 
+class RelativeProductRewardStrategy(RewardStrategy):
+    def __init__(self, min_reward):
+        super(RelativeProductRewardStrategy, self).__init__(min_reward)
+
+    # consider the number of free time slots before the last scheduled action per machine
+    # compute the product over all the machines. 
+    def compute_reward(self, schedule):
+        return -np.product([1/(np.sum(row[:np.max(np.nonzero(row))+1] != 0)/(np.max(np.nonzero(row))+1)) if np.any(row != 0) else 1 for row in schedule])
+
 class MinSpanTimeRewardStrategy(RewardStrategy):
 
     def __init__(self, min_reward):

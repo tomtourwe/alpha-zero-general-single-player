@@ -13,8 +13,8 @@ class MCTS():
     This class handles the MCTS tree.
     """
 
-    def __init__(self, game, nnet, args):
-        self.game = game.get_copy()
+    def __init__(self, nnet, args):
+        # self.game = game.get_copy()
         self.nnet = nnet
         self.args = args
         self.Qsa = {}  # stores Q values for s,a (as defined in the paper)

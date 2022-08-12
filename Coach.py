@@ -25,7 +25,7 @@ class Coach():
         self.nnet = nnet
         self.pnet = self.nnet.__class__(self.game)  # the competitor network
         self.args = args
-        self.mcts = MCTS(self.game, self.nnet, self.args)
+        self.mcts = MCTS(self.nnet, self.args)
         self.trainExamplesHistory = []  # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
 
@@ -129,7 +129,7 @@ class Coach():
                 iterationTrainExamples = deque([], maxlen=self.args.maxlenOfQueue)
 
                 for _ in tqdm(range(self.args.numEps), desc="Self Play"):
-                    self.mcts = MCTS(self.game, self.nnet, self.args)  # reset search tree
+                    self.mcts = MCTS(self.nnet, self.args)  # reset search tree
                     iterationTrainExamples += self.executeEpisode()
 
                 # save the iteration examples to the history 
@@ -143,25 +143,15 @@ class Coach():
             # NB! the examples were collected using the model from the previous iteration, so (i-1)  
             self.saveTrainExamples(i - 1)
 
-            # shuffle examples before training
-            trainExamples = []
-            for e in self.trainExamplesHistory:
-                trainExamples.extend(e)
-            shuffle(trainExamples)
-
-            # Ranked reward: we replace the actual reward with 0 or 1, depending on whether
-            # that reward is smaller/larger than the 75 percentile of all rewards.
-            log.info(f"Percentile is {np.percentile([e[2] for e in trainExamples], 75)}")
-            perc = np.percentile([e[2] for e in trainExamples], 75)
-            trainExamples = [(e[0], e[1], 1 if e[2]>perc else 0) for e in trainExamples]
+            trainExamples, perc = self.prepareTrainExamples()
 
             # training new network, keeping a copy of the old one
             self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             self.pnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
-            pmcts = MCTS(self.game, self.pnet, self.args)
+            pmcts = MCTS(self.pnet, self.args)
 
             self.nnet.train(trainExamples)
-            nmcts = MCTS(self.game, self.nnet, self.args)
+            nmcts = MCTS(self.nnet, self.args)
 
             log.info('PITTING AGAINST PREVIOUS VERSION')
             # arena = PlanningArena(lambda x: np.argmax(pmcts.getActionProb(x, verbose=True, temp=0)),
@@ -178,6 +168,27 @@ class Coach():
                 log.info('ACCEPTING NEW MODEL')
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename=self.getCheckpointFile(i))
                 self.nnet.save_checkpoint(folder=self.args.checkpoint, filename='best.pth.tar')
+
+    def prepareTrainExamples(self):
+        # Ranked reward: we replace the actual reward with 0 or 1, depending on whether
+        # that reward is smaller/larger than the 75 percentile of all rewards.
+        
+        # compute .75 percentile for the last iteration
+        iterationExamples = self.trainExamplesHistory[-1]
+        perc = np.percentile([e[2] for e in iterationExamples], 75)
+        log.info(f"Percentile is {perc}")
+
+        trainExamples = []
+        for e in self.trainExamplesHistory:
+            trainExamples.extend(e)
+
+        # compute the ranked reward for all training examples (not only the last iteration)
+        trainExamples = [(np.where(e[0] != 0, 1, 0), e[1], 1 if e[2]>perc else 0) for e in trainExamples]
+        
+        # shuffle examples before training
+        shuffle(trainExamples)
+
+        return trainExamples, perc
 
     def getCheckpointFile(self, iteration):
         return 'checkpoint_' + str(iteration) + '.pth.tar'
